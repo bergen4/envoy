@@ -627,7 +627,20 @@ public:
       : filter_manager_callbacks_(filter_manager_callbacks), dispatcher_(dispatcher),
         connection_(connection), stream_id_(stream_id), account_(std::move(account)),
         proxy_100_continue_(proxy_100_continue), buffer_limit_(buffer_limit),
-        filter_chain_factory_(filter_chain_factory) {}
+        filter_chain_factory_(filter_chain_factory) {
+    const auto& con_metadata = connection.streamInfo().dynamicMetadata();
+    std::string con_metadata_str;
+    google::protobuf::util::JsonPrintOptions options;
+    options.add_whitespace = false;
+    options.always_print_primitive_fields = true;
+    options.preserve_proto_field_names = true;
+    bool pbres = google::protobuf::util::MessageToJsonString(con_metadata, &con_metadata_str, options).ok();
+    ENVOY_STREAM_LOG(debug, "con_metadata: {}, {}", *this, con_metadata_str, pbres);
+    for (const auto& kv: con_metadata.filter_metadata()) {
+	    stream_info_.setDynamicMetadata(kv.first, kv.second);
+    }
+  }
+
   ~FilterManager() override {
     ASSERT(state_.destroyed_);
     ASSERT(state_.filter_call_state_ == 0);
