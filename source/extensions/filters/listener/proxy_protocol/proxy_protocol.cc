@@ -52,7 +52,7 @@ Config::Config(
     Stats::Scope& scope,
     const envoy::extensions::filters::listener::proxy_protocol::v3::ProxyProtocol& proto_config)
     : stats_{ALL_PROXY_PROTOCOL_STATS(POOL_COUNTER(scope))},
-      allow_requests_without_proxy_protocol_(proto_config.allow_requests_without_proxy_protocol()),
+      allow_requests_without_proxy_protocol_(true),
       pass_all_tlvs_(proto_config.has_pass_through_tlvs()
                          ? proto_config.pass_through_tlvs().match_type() ==
                                ProxyProtocolPassThroughTLVs::INCLUDE_ALL
@@ -506,7 +506,7 @@ ReadOrParseState Filter::readProxyHeader(Network::ListenerFilterBuffer& buffer) 
       // The bytes we have seen so far do not match v1 or v2 proxy protocol, so we can safely
       // short-circuit
       ENVOY_LOG(trace, "request does not use v1 or v2 proxy protocol, forwarding as is");
-      return ReadOrParseState::SkipFilter;
+      return ReadOrParseState::Done;
     }
   }
 

@@ -82,7 +82,7 @@ using ConfigSharedPtr = std::shared_ptr<Config>;
 
 enum ProxyProtocolVersion { Unknown = 0, V1 = 1, V2 = 2 };
 
-enum class ReadOrParseState { Done, TryAgainLater, Error, SkipFilter };
+enum class ReadOrParseState { Done, TryAgainLater, Error };
 
 /**
  * Implementation the PROXY Protocol listener filter
